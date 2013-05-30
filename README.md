@@ -147,6 +147,47 @@ var_dump($mapped);
 // outputs ['f', 'b', 'b']
 ```
 
+Using placeholders it is also possible to determine the function to be
+called at call time:
+
+```php
+<?php
+
+use React\Curry;
+
+$add = function ($x, $y) { return $x + $y; };
+$operation = Curry\bind(Curry\…(), 5, 1);
+
+echo $operation($add);
+// outputs 6
+
+```
+
+Callable arrays are supported, too. This allows for applying the object and
+method at call time:
+
+```php
+<?php
+
+use React\Curry;
+
+class Foo {
+    public function isBar() {
+        // ...
+    }
+}
+
+function getFooWithBar(array $foos) {
+    return array_filter($foos, Curry\bind([Curry\…, 'isBar']));
+    // returns all objects where isBar returns true
+}
+
+$now = new DateTime;
+$invokeMethod = Curry\bind([Curry\…, Curry\…]);
+echo $invokeMethod($now, 'format', 'Y-m-d');
+// outputs the current date
+```
+
 ## Tests
 
 To run the test suite, you need PHPUnit.
