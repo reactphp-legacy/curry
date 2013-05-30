@@ -53,6 +53,41 @@ class BindTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('f', $substr('foo', 1));
     }
 
+    public function testBindWithCallable()
+    {
+        $add = $this->createAddFunction();
+        $callCallable = bind(…(), 1, 5);
+        $this->assertSame(6, $callCallable($add));
+    }
+
+    public function testBindWithCallableArrayAndObject()
+    {
+        $object = new TestClass;
+        $callFoo = bind(array(…(), 'foo'));
+        $this->assertSame(42, $callFoo($object));
+    }
+
+    public function testBindWithCallableArrayAndMethod()
+    {
+        $object = new TestClass;
+        $callObject = bind(array($object, …()));
+        $this->assertSame(42, $callObject('foo'));
+    }
+
+    public function testBindWithCallableArray()
+    {
+        $object = new TestClass;
+        $callObjectAndMethod = bind(array(…(), …()));
+        $this->assertSame(42, $callObjectAndMethod($object, 'foo'));
+    }
+
+    public function testBindWithCallableArrayAndOneArg()
+    {
+        $object = new TestClass;
+        $callObjectAndMethodWithOneArg = bind(array(…(), …()), 23);
+        $this->assertSame(23, $callObjectAndMethodWithOneArg($object, 'foo'));
+    }
+
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Cannot resolve parameter placeholder at position 0. Parameter stack is empty

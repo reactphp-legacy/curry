@@ -4,13 +4,21 @@ namespace React\Curry;
 
 use React\Curry\Placeholder;
 
-function bind(/*$fn, $args...*/)
+function bind(/*$fn, $bound...*/)
 {
-    $args = func_get_args();
-    $fn = array_shift($args);
+    $bound = func_get_args();
+    $fn = array_shift($bound);
 
-    return function () use ($fn, $args) {
-        return call_user_func_array($fn, mergeParameters($args, func_get_args()));
+    return function () use ($fn, $bound) {
+        $args = func_get_args();
+
+        if ($fn instanceof Placeholder) {
+            $fn = $fn->resolve($args, 0);
+        } elseif (is_array($fn)) {
+            $fn = mergeParameters($fn, $args);
+        }
+
+        return call_user_func_array($fn, mergeAndAppendParameters($bound, $args));
     };
 }
 
@@ -25,7 +33,7 @@ function placeholder()
 }
 
 /** @internal */
-function mergeParameters(array $left, array $right)
+function mergeParameters(array $left, array &$right)
 {
     foreach ($left as $position => &$param) {
         if ($param instanceof Placeholder) {
@@ -33,5 +41,13 @@ function mergeParameters(array $left, array $right)
         }
     }
 
-    return array_merge($left, $right);
+    return $left;
+}
+
+/** @internal */
+function mergeAndAppendParameters(array $left, array $right)
+{
+    $merged = mergeParameters($left, $right);
+
+    return array_merge($merged, $right);
 }
