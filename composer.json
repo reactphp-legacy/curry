@@ -1,6 +1,6 @@
 {
     "name": "react/curry",
-    "description": "Partial function application.",
+    "description": "[DEPRECATED] Partial function application. See react/partial.",
     "keywords": ["curry", "currying", "functional-programming"],
     "license": "MIT",
     "require": {
